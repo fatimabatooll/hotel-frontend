@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useHotels from '../Hooks/useHotels';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, Typography, Box } from '@mui/material';
+import useBooking from '../Hooks/useBooking';
 
 const BookForm = () => {
   const { hotelId } = useParams();
@@ -26,12 +27,14 @@ const BookForm = () => {
 
   const navigate = useNavigate();
 
+  const { saveBookings, isLoad, error } = useBooking();
+
   const calculateTotalPrice = (e) => {
     e.preventDefault();
 
     const numberOfNights = getNumberOfNights();
     const roomRate = hotel.price;
-    const taxRate = 0.12; // 12% tax rate
+    const taxRate = 0.12;
 
     const price = numberOfNights * roomRate;
     const calculatedTax = price * taxRate;
@@ -43,84 +46,98 @@ const BookForm = () => {
   const getNumberOfNights = () => {
     const arrival = new Date(arrivalDate);
     const departure = new Date(departureDate);
-    const oneDay = 24 * 60 * 60 * 1000; // One day in milliseconds
+    const oneDay = 24 * 60 * 60 * 1000;
 
     const diffDays = Math.round(Math.abs((departure - arrival) / oneDay));
     return diffDays;
   };
 
   const handleBookStay = () => {
-    // Perform any additional booking logic here
-    navigate('/confirmation', {
-      state: {
-        hotelName: hotel.name,
-        guestName: name,
-        guestAddress: address,
-        guestEmail: email,
-        arrivalDate,
-        departureDate,
-        totalPrice,
-        tax,
+    const bookingData = {
+      hotelId: hotel.id,
+      name: hotel.name,
+      guestName: name,
+      guestAddress: address,
+      guestEmail: email,
+      arrivalDate,
+      departureDate,
+      totalPrice,
+      tax,
+    };
+
+    saveBookings(
+      bookingData,
+      (responseData) => {
+        console.log('Booking saved successfully:', responseData);
+        navigate('/confirmation', { state: { bookingData } });
       },
-    });
+      (error) => {
+        console.log('Error saving booking:', error);
+      }
+    );
   };
 
   const handleCancel = () => {
-    navigate('/'); // Navigate back to the main search page
+    navigate('/');
   };
+
   if (!hotel) {
     return <p>Loading...</p>;
   }
 
   return (
-    <div>
-      <h2>Book Now</h2>
-      <p>{hotel.name}</p>
-      <form>
-        <TextField
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-        <TextField
-          label="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          required
-        />
-        <TextField
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <TextField
-          type="date"
-          label="Arrival Date"
-          value={arrivalDate}
-          onChange={(e) => setArrivalDate(e.target.value)}
-          required
-        />
-        <TextField
-          type="date"
-          label="Departure Date"
-          value={departureDate}
-          onChange={(e) => setDepartureDate(e.target.value)}
-          required
-        />
-        <Button type="submit" onClick={calculateTotalPrice}>
-          Calculate Total Price
-        </Button>
-        <div>
-          <p>Total Price: {totalPrice}</p>
-          <p>Tax: {tax}</p>
-        </div>
-        <Button onClick={handleBookStay}>Book My Stay</Button>
-        <Button onClick={handleCancel}>Cancel</Button>
-
-      </form>
-    </div>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box sx={{ maxWidth: '400px', p: 4, border: '1px solid #ccc', borderRadius: '4px' }}>
+        <Typography variant="h4" align="center" mb={4}>
+          Book Now
+        </Typography>
+        <Typography variant="h6" align="center" mb={2}>
+          {hotel.name}
+        </Typography>
+        <form>
+          <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required fullWidth mb={2} sx={{ marginTop: '20px'}} />
+          <TextField label="Address" value={address} onChange={(e) => setAddress(e.target.value)} required fullWidth mb={2}sx={{ marginTop: '20px'}} />
+          <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth mb={2} sx={{ marginTop: '20px'}}/>
+          <TextField
+            type="date"
+            label="Arrival Date"
+            value={arrivalDate}
+            onChange={(e) => setArrivalDate(e.target.value)}
+            required
+            fullWidth
+            mb={2}
+            sx={{ marginTop: '20px'}}
+          />
+          <TextField
+            type="date"
+            label="Departure Date"
+            value={departureDate}
+            onChange={(e) => setDepartureDate(e.target.value)}
+            required
+            fullWidth
+            mb={2}
+            sx={{ marginTop: '20px'}}
+          />
+          <Button type="submit" variant="contained" sx={{ marginTop: '20px'}} onClick={calculateTotalPrice} fullWidth mb={2}>
+            Calculate Total Price
+          </Button>
+          <div>
+            <Typography variant="body1" mb={1}>
+              Total Price: {totalPrice}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Tax: {tax}
+            </Typography>
+          </div>
+          <Button variant="contained"  onClick={handleBookStay} fullWidth mb={2}>
+            Book My Stay
+          </Button>
+          <Button variant="contained" sx={{ marginTop: '20px'}} onClick={handleCancel} fullWidth >
+            Cancel
+          </Button>
+        </form>
+      </Box>
+    </Box>
   );
 };
 

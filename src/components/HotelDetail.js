@@ -1,44 +1,65 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useHotels from '../Hooks/useHotels';
-import { Button } from '@mui/material';
-
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 const HotelDetail = () => {
   const { hotelId } = useParams();
   const hotels = useHotels([]);
 
-  const navigate = useNavigate(); // Use the useNavigate hook for navigation
+  const navigate = useNavigate(); 
 
-  // Find the hotel with the matching hotelId
   const hotel = hotels.find((hotel) => hotel.id === parseInt(hotelId));
 
   if (!hotel) {
     return <p>Loading...</p>;
   }
   const goToSearch = () => {
-    navigate('/'); // Navigate back to the previous location (filtered results)
-
+    navigate('/'); 
   };
+
   const goToBookForm = () => {
-    navigate(`/hotel/${hotelId}/book`)
+    navigate(`/hotel/${hotelId}/book`);
   };
 
   return (
-    <div>
-      <h2>{hotel.name}</h2>
-      <p>{hotel.shortDescription}</p>
-      <p>{hotel.longDescription}</p>
-      <img src={hotel.imageLink} alt={hotel.name} />
-      <p>Location: {hotel.location}</p>
-      <p>Experience: {hotel.experience}</p>
-      <p>Has Pool: {hotel.haspool ? 'Yes' : 'No'}</p>
-      <p>Price: {hotel.price}</p>
-      <Button onClick={goToSearch}>Return to result</Button>
-      <Button onClick={() => goToBookForm(hotel.id)}>Book now</Button>
+    <Card sx={{ maxWidth: 500,  margin: 'auto', marginTop: '20px' }}>
+      <CardContent>
+        <Typography variant="h2">{hotel.name}</Typography>
+        <Typography variant="subtitle1" color="text.secondary">
+          {hotel.shortDescription}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {hotel.longDescription}
+        </Typography>
+        <CardMedia
+          component="img"
+          height="240"         
+          image={hotel.imageLink}
+          alt={hotel.name}
+        />
+        <Typography variant="body2">Location: {hotel.location}</Typography>
+        <Typography variant="body2">Experience: {hotel.experience}</Typography>
+        <Typography variant="body2">
+          Has Pool: {hotel.haspool ? 'Yes' : 'No'}
+        </Typography>
+        <Typography variant="body2">Price: {hotel.price}</Typography>
+      </CardContent>
 
-
-    </div>
+      <CardActions>
+        <Button onClick={goToSearch} variant="contained">
+          Return to Results
+        </Button>
+        <Button onClick={goToBookForm} variant="contained" color="primary">
+          Book Now
+        </Button>
+      </CardActions>
+    </Card>
   );
 };
 

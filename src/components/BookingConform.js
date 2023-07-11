@@ -1,32 +1,54 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Typography, Box, Button } from '@mui/material';
 
 const BookingConfirmation = () => {
   const location = useLocation();
-  const {
-    hotelName,
-    guestName,
-    guestAddress,
-    guestEmail,
-    arrivalDate,
-    departureDate,
-    totalPrice,
-    tax,
-  } = location.state;
+  const bookingData = location.state?.bookingData;
+  const navigate = useNavigate(); 
 
+  const handleStart = () => {
+    navigate('/');
+  };
   return (
-    <div>
-      <h2>Your stay has been booked.</h2>
-      <p>Summary of important information:</p>
-      <p>Hotel: {hotelName}</p>
-      <p>Name: {guestName}</p>
-      <p>Address: {guestAddress}</p>
-      <p>Email: {guestEmail}</p>
-      <p>Arrival Date: {arrivalDate}</p>
-      <p>Departure Date: {departureDate}</p>
-      <p>Total Price: {totalPrice}</p>
-      <p>Tax: {tax}</p>
-    </div>
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Box sx={{ maxWidth: '400px', p: 4, border: '1px solid #ccc', borderRadius: '4px' }}>
+        <Typography variant="h4" align="center" mb={4}>
+          Confirmation
+        </Typography>
+        {bookingData && (
+          <div>
+            <Typography variant="body1" mb={2}>
+              Hotel Name: {bookingData.name}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Guest Name: {bookingData.guestName}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Guest Address: {bookingData.guestAddress}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Guest Email: {bookingData.guestEmail}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Arrival Date: {bookingData.arrivalDate}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Departure Date: {bookingData.departureDate}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Total Price: {bookingData.totalPrice}
+            </Typography>
+            <Typography variant="body1" mb={2}>
+              Tax: {bookingData.tax}
+            </Typography>
+            <Button variant="contained" sx={{ marginTop: '20px'}} onClick={handleStart} fullWidth >
+            startOver
+          </Button>
+          </div>
+        )}
+      </Box>
+    </Box>
   );
 };
 
