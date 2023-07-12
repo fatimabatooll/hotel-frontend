@@ -5,7 +5,7 @@ const useHotels = (initialValue) => {
 
   useEffect(() => {
     async function loadData() {
-      const url = `http://localhost:8080/hotel/getall`;
+      const url = `http://localhost:8080/hotels/getall`;
       const response = await fetch(url);
       if (response.status !== 200) {
         setHotels([]);

@@ -27,7 +27,7 @@ const BookForm = () => {
 
   const navigate = useNavigate();
 
-  const { saveBookings, isLoad, error } = useBooking();
+  const { saveBookings} = useBooking();
 
   const calculateTotalPrice = (e) => {
     e.preventDefault();
