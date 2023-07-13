@@ -17,37 +17,39 @@ const BookForm = () => {
     }
   }, [hotels, hotelId]);
 
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [email, setEmail] = useState('');
-  const [arrivalDate, setArrivalDate] = useState('');
-  const [departureDate, setDepartureDate] = useState('');
+  const [name, setName] = useState(localStorage.getItem('name') || '');
+  const [address, setAddress] = useState(localStorage.getItem('address') || '');
+  const [email, setEmail] = useState(localStorage.getItem('email') || '');
+  const [arrivalDate, setArrivalDate] = useState(localStorage.getItem('arrivalDate') || '');
+  const [departureDate, setDepartureDate] = useState(localStorage.getItem('departureDate') || '');
   const [totalPrice, setTotalPrice] = useState(0);
   const [tax, setTax] = useState(0);
 
   const navigate = useNavigate();
 
-  const { saveBookings} = useBooking();
+  const { saveBookings } = useBooking();
 
-  const calculateTotalPrice = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    // Calculate total price when arrival or departure date changes
+    calculateTotalPrice();
+  }, [arrivalDate, departureDate]);
 
-    const numberOfNights = getNumberOfNights();
-    const roomRate = hotel.price;
-    const taxRate = 0.12;
-
-    const price = numberOfNights * roomRate;
-    const calculatedTax = price * taxRate;
-
-    setTotalPrice(price);
-    setTax(calculatedTax);
+  const calculateTotalPrice = () => {
+    if (hotel && arrivalDate && departureDate) {
+      const numberOfNights = getNumberOfNights();
+      const roomRate = hotel.price;
+      const taxRate = 0.12;
+      const price = numberOfNights * roomRate;
+      const calculatedTax = price * taxRate;
+      setTotalPrice(price);
+      setTax(calculatedTax);
+    }
   };
 
   const getNumberOfNights = () => {
     const arrival = new Date(arrivalDate);
     const departure = new Date(departureDate);
     const oneDay = 24 * 60 * 60 * 1000;
-
     const diffDays = Math.round(Math.abs((departure - arrival) / oneDay));
     return diffDays;
   };
@@ -81,6 +83,30 @@ const BookForm = () => {
     navigate('/');
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    localStorage.setItem(name, value);
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'address':
+        setAddress(value);
+        break;
+      case 'email':
+        setEmail(value);
+        break;
+      case 'arrivalDate':
+        setArrivalDate(value);
+        break;
+      case 'departureDate':
+        setDepartureDate(value);
+        break;
+      default:
+        break;
+    }
+  };
+
   if (!hotel) {
     return <p>Loading...</p>;
   }
@@ -95,30 +121,66 @@ const BookForm = () => {
           {hotel.name}
         </Typography>
         <form>
-          <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} required fullWidth mb={2} sx={{ marginTop: '20px'}} />
-          <TextField label="Address" value={address} onChange={(e) => setAddress(e.target.value)} required fullWidth mb={2}sx={{ marginTop: '20px'}} />
-          <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth mb={2} sx={{ marginTop: '20px'}}/>
           <TextField
-            type="date"
-            label="Arrival Date"
-            value={arrivalDate}
-            onChange={(e) => setArrivalDate(e.target.value)}
+            label="Name"
+            name="name"
+            value={name}
+            onChange={handleInputChange}
             required
             fullWidth
             mb={2}
-            sx={{ marginTop: '20px'}}
+            sx={{ marginTop: '20px' }}
+          />
+          <TextField
+            label="Address"
+            name="address"
+            value={address}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            mb={2}
+            sx={{ marginTop: '20px' }}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={email}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            mb={2}
+            sx={{ marginTop: '20px' }}
+          />
+          <TextField
+            type="date"
+            label="Arrival Date"
+            name="arrivalDate"
+            value={arrivalDate}
+            onChange={handleInputChange}
+            required
+            fullWidth
+            mb={2}
+            sx={{ marginTop: '20px' }}
           />
           <TextField
             type="date"
             label="Departure Date"
+            name="departureDate"
             value={departureDate}
-            onChange={(e) => setDepartureDate(e.target.value)}
+            onChange={handleInputChange}
             required
             fullWidth
             mb={2}
-            sx={{ marginTop: '20px'}}
+            sx={{ marginTop: '20px' }}
           />
-          <Button type="submit" variant="contained" sx={{ marginTop: '20px'}} onClick={calculateTotalPrice} fullWidth mb={2}>
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{ marginTop: '20px' }}
+            onClick={calculateTotalPrice}
+            fullWidth
+            mb={2}
+          >
             Calculate Total Price
           </Button>
           <div>
@@ -129,10 +191,10 @@ const BookForm = () => {
               Tax: {tax}
             </Typography>
           </div>
-          <Button variant="contained"  onClick={handleBookStay} fullWidth mb={2}>
+          <Button variant="contained" onClick={handleBookStay} fullWidth mb={2}>
             Book My Stay
           </Button>
-          <Button variant="contained" sx={{ marginTop: '20px'}} onClick={handleCancel} fullWidth >
+          <Button variant="contained" sx={{ marginTop: '20px' }} onClick={handleCancel} fullWidth>
             Cancel
           </Button>
         </form>
