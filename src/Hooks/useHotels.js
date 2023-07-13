@@ -4,17 +4,25 @@ const useHotels = (initialValue) => {
   const [hotels, setHotels] = useState(initialValue);
 
   useEffect(() => {
-    async function loadData() {
-      const url = `http://localhost:8080/hotels/getall`;
-      const response = await fetch(url);
-      if (response.status !== 200) {
-        setHotels([]);
-        return;
-      }
-      const data = await response.json();
-      setHotels(data);
-      console.log("Fetched data:", data);
-    }
+    const loadData = () => {
+      const url = "http://localhost:8080/hotels/getall";
+      fetch(url)
+        .then((response) => {
+          if (response.status !== 200) {
+            setHotels([]);
+            throw new Error("Error fetching hotels");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setHotels(data);
+          console.log("Fetched data:", data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+
     if (hotels.length === 0) {
       loadData();
     }

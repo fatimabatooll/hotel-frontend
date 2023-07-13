@@ -194,7 +194,7 @@ const Search = () => {
               sx={{ marginLeft: '10px' }}
               control={<Checkbox checked={hasPool} onChange={(e) => setHasPool(e.target.checked)} />}
               label="Pool Required"
-            />
+            />;
           </Box>
         </Card>
       </div>
